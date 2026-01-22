@@ -1,15 +1,20 @@
-## 2. MR 결과 해석(IVW와 관련하여)
-개별 SNP을 $G$, outcome을 $Y$라고 했을 때, GWAS 수식을
-$$Y = \alpha + \beta_G + \epsilon$$
-라고 표현할 수 있습니다.
+# MR 결과 해석(IVW와 관련하여)
 
-이 때 $\beta$의 standard error를 구하는 방법은 다음과 같습니다. 
+개별 SNP을 $G$, outcome을 $Y$라고 했을 때, GWAS 수식을 다음과 같이 표현할 수 있습니다.
 
-$$se(\hat{\beta}) = \frac{\sigma_e}{\sigma_G\sqrt{N}}$$
+$$
+Y = \alpha + \beta_G + \epsilon
+$$
 
-여기서 분자에 해당하는 $\sigma_e$는 잔차(residual)의 표준편차이고, SNP이 설명하지 못하는 outcome의 변동성입니다. 
+이 때 $\beta$의 standard error를 구하는 방법은 다음과 같습니다.
 
-그런데 실제로 개별 SNP 하나가 설명하는 분산($R^2$)은 보통 0.01 미만으로 매우 작기 때문에 잔차의 분산은 전체 outcome의 분산과 같다고 간주할 수 있고, 전체 outcome의 분산은 SNP의 영향을 받지 않으므로 고정된 값인 상수입니다. 
+$$
+se(\hat{\beta}) = \frac{\sigma_e}{\sigma_G\sqrt{N}}
+$$
+
+여기서 분자에 해당하는 $\sigma_e$는 잔차(residual)의 표준편차이고, SNP이 설명하지 못하는 outcome의 변동성입니다.
+
+그런데 실제로 개별 SNP 하나가 설명하는 분산($R^2$)은 보통 0.01 미만으로 매우 작기 때문에 잔차의 분산은 전체 outcome의 분산과 같다고 간주할 수 있고, 전체 outcome의 분산은 SNP의 영향을 받지 않으므로 고정된 값인 상수입니다.
 
 분모를 구성하는 $\sigma_G$는 개별 SNP이 설명하는 outcome의 변동성(분산)입니다.
 
@@ -19,43 +24,55 @@ $$se(\hat{\beta}) = \frac{\sigma_e}{\sigma_G\sqrt{N}}$$
 
 그렇다면 왜 이렇게 멀고도 험한 길을 왔냐, 바로 IVW에 대한 이해를 위해서입니다.
 
-exposure에 대한 SNP $i$의 effect size를 $\hat{\beta}_{X,i}$,
-outcome에 대한 SNP $i$의 effect size를 $\hat{\beta}_{Y,i}$라고 하면
+exposure에 대한 SNP $i$의 effect size를 $\hat{\beta}_{X,i}$, outcome에 대한 SNP $i$의 effect size를 $\hat{\beta}_{Y,i}$라고 하면
 
 (1)
-$$\text{Wald ratio} = \hat{\beta}_{MR,i} = \frac{\hat{\beta}_{Y,i}}{\hat{\beta}_{X,i}}$$
+
+$$
+\text{Wald ratio} = \hat{\beta}_{MR,i} = \frac{\hat{\beta}_{Y,i}}{\hat{\beta}_{X,i}}
+$$
 
 로 표현을 하고, 이를 복수의 도구변수로 확장한 것이 IVW(inverse-variance weight) estimation 입니다.
 
-이 때, IVW는 단순히 여러 IV들의 beta를 평균 낸것이 아니라, 분산의 역수(inverse varaince)를 가중치로 사용하여 가중평균을 냅니다. 
+이 때, IVW는 단순히 여러 IV들의 beta를 평균 낸것이 아니라, 분산의 역수(inverse varaince)를 가중치로 사용하여 가중평균을 냅니다.
 
 가중치 $w_i$는 다음과 같이 정의 됩니다.
 
 (2)
-$$w_i = \frac{1}{var(\hat{\beta}_{MR,i})} = \frac{1}{se(\hat{\beta}_{MR,i})^2}$$
 
-이때 Delta method를 이용해 $se(\hat{\beta}_{MR,i})$는 다음과 같이 유도됩니다. 
+$$
+w_i = \frac{1}{var(\hat{\beta}_{MR,i})} = \frac{1}{se(\hat{\beta}_{MR,i})^2}
+$$
+
+이때 Delta method를 이용해 $se(\hat{\beta}_{MR,i})$는 다음과 같이 유도됩니다.
 
 (이 과정에서 Delta method의 1차 테일러 근사와 NOME(NO Measurement Error in exposure)가정이 사용되는데 이에 대한 설명은 생략하겠습니다.)
 
 (3)
-$$se(\hat{\beta}_{MR,i}) \approx \frac{se(\hat{\beta}_{Y,i})}{|\hat{\beta}_{X,i}|}$$
+
+$$
+se(\hat{\beta}_{MR,i}) \approx \frac{se(\hat{\beta}_{Y,i})}{|\hat{\beta}_{X,i}|}
+$$
 
 (2) 수식에 (3)을 대입하면 $w_i$를 다음과 같이 표현할 수 있습니다.
 
-$$w_i \approx \frac{\hat{\beta}^2_{X,i}}{se(\hat{\beta}_{Y,i})^2}$$
+$$
+w_i \approx \frac{\hat{\beta}^2_{X,i}}{se(\hat{\beta}_{Y,i})^2}
+$$
 
-이 때, 아까 $se(\hat{\beta}_{Y,i})$는 샘플 수가 지배적인 영향을 미쳐 모든 SNP에서 비슷한 것을 알게되었으므로 $w_i$는 결국 $\hat{\beta}^2_{X,i}$에 근사합니다. 
+이 때, 아까 $se(\hat{\beta}_{Y,i})$는 샘플 수가 지배적인 영향을 미쳐 모든 SNP에서 비슷한 것을 알게되었으므로 $w_i$는 결국 $\hat{\beta}^2_{X,i}$에 근사합니다.
 
-다시 정리하고 가자면, IVW에 사용되는 가중치는 곧 exposure에 대한 도구변수의 effect size에 의존합니다. 
+다시 정리하고 가자면, IVW에 사용되는 가중치는 곧 exposure에 대한 도구변수의 effect size에 의존합니다.
 
 그렇다면 도구변수의 P-value와 beta(effect size)가 연관이 있다는 것을 확인한다면, effect size와 IVW 값 간의 연관성을 주장할 수 있겠죠.
 
-"Instrument varibale의 p-value" 챕터에서 도구변수의 test statistics인 Z-score가 클수록 p-value가 작아지는 것을 확인했습니다. 
+"Instrument varibale의 p-value" 챕터에서 도구변수의 test statistics인 Z-score가 클수록 p-value가 작아지는 것을 확인했습니다.
 
-이 때 Z-score는 아래와 같이 계산됩니다. 
+이 때 Z-score는 아래와 같이 계산됩니다.
 
-$$Z_i = \frac{\hat{\beta}_{X,i}}{se(\hat{\beta}_{X,i})}$$
+$$
+Z_i = \frac{\hat{\beta}_{X,i}}{se(\hat{\beta}_{X,i})}
+$$
 
 $se(\hat{\beta}_{X,i})$가 일정하다고 가정할 때, $\hat{\beta}_{X,i}$가 커질 수록 $Z_i$가 커진다는 것을 알 수 있습니다.
 
